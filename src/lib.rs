@@ -19,7 +19,7 @@ mod logic;
 #[http_component]
 fn handle_route(req: Request) -> Result<Response> {
     let mut router = Router::new();
-    router.get("/info", api::info);
+    router.get("/", api::info);
     router.post("/move", api::move_);
     router.any("/*", api::echo_wildcard);
     router.handle(req)
