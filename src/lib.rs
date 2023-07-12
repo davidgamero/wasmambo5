@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use serde::{Serialize, Deserialize};
 use serde_json::Value;
 use anyhow::Result;
 use spin_sdk::{
@@ -19,6 +20,7 @@ mod logic;
 fn handle_route(req: Request) -> Result<Response> {
     let mut router = Router::new();
     router.get("/info", api::info);
+    router.post("/move", api::move_);
     router.any("/*", api::echo_wildcard);
     router.handle(req)
 }
@@ -34,6 +36,23 @@ mod api {
             .status(http::StatusCode::OK)
             .body(Some(logic::info()))?)
     }
+    
+    pub fn move_(_req: Request, params: Params) -> Result<Response> {
+
+        let b = _req.body().as_ref().unwrap();
+        //turn b into GAmestate
+        let gs: GameState = serde_json::from_slice(&b).unwrap();
+        
+        Ok(http::Response::builder()
+           .status(http::StatusCode::OK)
+           .body(Some(
+                   logic::get_move(
+                       &gs.game,
+                       &gs.turn,
+                       &gs.board,
+                       &gs.you          
+                       )))?)
+    }
 
     // /*
     pub fn echo_wildcard(_req: Request, params: Params) -> Result<Response> {
@@ -44,12 +63,14 @@ mod api {
     }
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct Game {
     id: String,
     ruleset: HashMap<String, Value>,
     timeout: u32,
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct Board {
     height: u32,
     width: u32,
@@ -58,6 +79,7 @@ pub struct Board {
     hazards: Vec<Coord>,
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct Battlesnake {
     id: String,
     name: String,
@@ -69,11 +91,13 @@ pub struct Battlesnake {
     shout: Option<String>,
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct Coord {
     x: u32,
     y: u32,
 }
 
+#[derive(Serialize,Deserialize)]
 pub struct GameState {
     game: Game,
     turn: u32,

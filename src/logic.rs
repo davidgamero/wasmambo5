@@ -35,7 +35,6 @@ pub fn info() -> bytes::Bytes{
     
     // convert j to bytes::bytes::Bytes
     let j = serde_json::to_string(&j).unwrap(); // convert j to String
-
     let jb = bytes::Bytes::from(j); // convert j to bytes::Bytes
     return jb
 }
@@ -53,7 +52,7 @@ pub fn end(_game: &Game, _turn: &u32, _board: &Board, _you: &Battlesnake) {
 // move is called on every turn and returns your next move
 // Valid moves are "up", "down", "left", or "right"
 // See https://docs.battlesnake.com/api/example-move for available data
-pub fn get_move(_game: &Game, turn: &u32, _board: &Board, you: &Battlesnake) -> Value {
+pub fn get_move(_game: &Game, turn: &u32, _board: &Board, you: &Battlesnake) -> bytes::Bytes {
     
     let mut is_move_safe: HashMap<_, _> = vec![
         ("up", true),
@@ -105,5 +104,8 @@ pub fn get_move(_game: &Game, turn: &u32, _board: &Board, you: &Battlesnake) -> 
     // let food = &board.food;
 
     info!("MOVE {}: {}", turn, chosen);
-    return json!({ "move": chosen });
+    let m = json!({ "move": chosen });
+    let ms = serde_json::to_string(&m).unwrap();
+    let mb = bytes::Bytes::from(ms);
+    return mb
 }
