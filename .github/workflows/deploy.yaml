@@ -1,0 +1,101 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  image:
+    name: push image
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: setup go
+        uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753 # v4.0.1
+        with:
+          go-version: "1.20"
+
+      - name: setup tinygo
+        uses: rajatjindal/setup-actions/tinygo@b4a3ac9f32a080efff631ecd0b9a408830a6fb79 # v.0.0.1
+        with:
+          version: v0.28.1
+
+      - name: setup spin
+        uses: fermyon/actions/spin/setup@7f8c6c3006d78c2465aab9f3c3f4727d32fea836 # v1.0.5
+
+      - name: build
+        run: spin build
+
+        # need to lowercase repository because ghcr requires reference in lowercase
+      - name: get repository name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+        id: repo
+
+      - name: docker login
+        uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: push 
+        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
+        with:
+          context: .
+          push: true
+          tags: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
+
+  cluster:
+    name: deploy to cluster
+    runs-on: ubuntu-latest
+    environment: production
+    needs: image
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+
+      - name: azure login
+        uses: azure/login@92a5484dfaf04ca78a94597f4f19fea633851fa2 # v1.4.6
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: setup kubelogin
+        uses: azure/use-kubelogin@e1a8161c479fd5debcdec63db9a2c29f52ce6f5e # v1
+        with:
+          kubelogin-version: 'v0.0.30'
+
+      - name: get kubeconfig
+        uses: azure/aks-set-context@4edaee69f820359371ee8bc85189ac03a21d3a58 # v3.2
+        with:
+          resource-group: battlesnake
+          cluster-name: cluster
+          admin: false
+          use-kubelogin: true
+
+      - name: setup kubectl
+        uses: azure/setup-kubectl@901a10e89ea615cf61f57ac05cecdf23e7de06d8 # v3.2
+      
+        # need to lowercase repository because ghcr requires reference in lowercase
+      - name: get repository name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+        id: repo
+
+      - name: deploy
+        uses: azure/k8s-deploy@1082a9290dd683dfe1d60582f418a27684e3a391 # v4.10
+        with:
+          manifests: ./manifests
+          images: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
+
+
+
+
+
+
