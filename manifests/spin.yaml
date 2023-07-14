@@ -1,0 +1,8 @@
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: "wasmtime-spin-v1"
+handler: "spin"
+scheduling:
+  nodeSelector:
+    "kubernetes.azure.com/wasmtime-spin-v0-5-1": "true" # v0-5-1 actually uses v1.x spin https://github.com/fermyon/developer/issues/730
