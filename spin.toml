@@ -1,4 +1,4 @@
-spin_manifest_version = "1"
+spin_version = "1"
 authors = ["David Gamero <david340804@gmail.com>"]
 description = ""
 name = "wasmambo5"
@@ -13,4 +13,4 @@ allowed_http_hosts = []
 route = "/..."
 [component.build]
 command = "cargo build --target wasm32-wasi --release"
-watch = ["src/**/*.rs", "Cargo.toml"]
+# watch = ["src/**/*.rs", "Cargo.toml"]
