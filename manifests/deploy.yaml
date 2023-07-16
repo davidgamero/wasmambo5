@@ -12,7 +12,7 @@ spec:
       labels:
         app: rust-is-bad
     spec:
-      runtimeClassName: wasmtime-spin
+      runtimeClassName: wasmtime-spin-v1
       containers:
         - name: rust-is-bad
           image: default/rust-is-bad:0.1.0
