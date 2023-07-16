@@ -19,8 +19,8 @@ mod logic;
 #[http_component]
 fn handle_route(req: Request) -> Result<Response> {
     let mut router = Router::new();
-    router.get("/", api::info);
-    router.post("/move", api::move_);
+    // router.get("/", api::info);
+    // router.post("/move", api::move_);
     router.any("/*", api::echo_wildcard);
     router.handle(req)
 }
@@ -59,7 +59,7 @@ mod api {
         let capture = params.wildcard().unwrap_or_default();
         Ok(http::Response::builder()
             .status(http::StatusCode::OK)
-            .body(Some(format!("{capture}").into()))?)
+            .body(Some(format!("hello").into()))?)
     }
 }
 
