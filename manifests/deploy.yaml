@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rust-is-bad
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: rust-is-bad
+  template:
+    metadata:
+      labels:
+        app: rust-is-bad
+    spec:
+      runtimeClassName: wasmtime-spin
+      containers:
+        - name: rust-is-bad
+          image: default/rust-is-bad:0.1.0
+          command: ["/"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rust-is-bad
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: rust-is-bad
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rust-is-bad
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /rust-is-bad
+            pathType: Prefix
+            backend:
+              service:
+                name: rust-is-bad
+                port:
+                  number: 80
