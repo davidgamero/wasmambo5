@@ -15,7 +15,6 @@ spec:
       containers:
         - name: wasmambo5
           image: ghcr.io/davidgamero/wasmambo5
-          command: ["/"]
 ---
 apiVersion: v1
 kind: Service
