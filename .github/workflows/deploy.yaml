@@ -32,13 +32,14 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: push 
-        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
+
+      - name: spin push
+        uses: fermyon/actions/spin/push@7f8c6c3006d78c2465aab9f3c3f4727d32fea836 # v1.0.5
         with:
-          context: .
-          push: true
-          tags: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
+          registry: ghcr.io
+          registry_username: ${{ github.actor }}
+          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          registry_reference: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
 
   cluster:
     name: deploy to cluster
@@ -63,7 +64,7 @@ jobs:
       - name: setup kubelogin
         uses: azure/use-kubelogin@e1a8161c479fd5debcdec63db9a2c29f52ce6f5e # v1
         with:
-          kubelogin-version: 'v0.0.30'
+          kubelogin-version: "v0.0.30"
 
       - name: get kubeconfig
         uses: azure/aks-set-context@4edaee69f820359371ee8bc85189ac03a21d3a58 # v3.2
@@ -75,7 +76,7 @@ jobs:
 
       - name: setup kubectl
         uses: azure/setup-kubectl@901a10e89ea615cf61f57ac05cecdf23e7de06d8 # v3.2
-      
+
         # need to lowercase repository because ghcr requires reference in lowercase
       - name: get repository name
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
@@ -86,9 +87,3 @@ jobs:
         with:
           manifests: ./manifests
           images: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
-
-
-
-
-
-

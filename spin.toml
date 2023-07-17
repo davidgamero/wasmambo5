@@ -1,13 +1,13 @@
 spin_version = "1"
 authors = ["David Gamero <david340804@gmail.com>"]
 description = ""
-name = "rust-is-bad"
+name = "wasmambo5"
 trigger = { type = "http", base = "/" }
 version = "0.1.0"
 
 [[component]]
-id = "rust-is-bad"
-source = "target/wasm32-wasi/release/rust_is_bad.wasm"
+id = "wasmambo5"
+source = "target/wasm32-wasi/release/wasmambo5.wasm"
 allowed_http_hosts = []
 [component.trigger]
 route = "/..."
