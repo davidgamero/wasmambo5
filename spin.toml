@@ -1,4 +1,4 @@
-spin_version = "1"
+spin_manifest_version = "1"
 authors = ["David Gamero <david340804@gmail.com>"]
 description = ""
 name = "wasmambo5"
