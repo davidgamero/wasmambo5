@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wasmambo5
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wasmambo5
+  template:
+    metadata:
+      labels:
+        app: wasmambo5
+    spec:
+      runtimeClassName: wasmtime-spin
+      containers:
+        - name: wasmambo5
+          image: ghcr.io/davidgamero/wasmambo5
+          command: ["/"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wasmambo5
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: wasmambo5
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wasmambo5
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /wasmambo5
+            pathType: Prefix
+            backend:
+              service:
+                name: wasmambo5
+                port:
+                  number: 80
