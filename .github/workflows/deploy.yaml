@@ -32,14 +32,19 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: spin push
-        uses: fermyon/actions/spin/push@7f8c6c3006d78c2465aab9f3c3f4727d32fea836 # v1.0.5
+      - name: push
+        uses: docker/build-push-action@2eb1c1961a95fc15694676618e422e8ba1d63825 # v4.1.1
         with:
-          registry: ghcr.io
-          registry_username: ${{ github.actor }}
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
-          registry_reference: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
+          context: .
+          push: true
+          tags: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
+      # - name: spin push
+      #   uses: fermyon/actions/spin/push@7f8c6c3006d78c2465aab9f3c3f4727d32fea836 # v1.0.5
+      #   with:
+      #     registry: ghcr.io
+      #     registry_username: ${{ github.actor }}
+      #     registry_password: ${{ secrets.GITHUB_TOKEN }}
+      #     registry_reference: "ghcr.io/${{ steps.repo.outputs.REPO }}:${{ github.sha }}"
 
   cluster:
     name: deploy to cluster

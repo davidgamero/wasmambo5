@@ -12,6 +12,7 @@ spec:
       labels:
         app: wasmambo5
     spec:
+      runtimeClassName: wasmtime-spin-v1
       containers:
         - name: wasmambo5
           image: ghcr.io/davidgamero/wasmambo5
