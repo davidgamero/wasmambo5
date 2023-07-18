@@ -24,8 +24,8 @@ fn handle_wasmambo5(req: Request) -> Result<Response> {
 
     let mut router = ImTheRouterNow::new();
     router.add_route("/move", api::move_);
-    router.add_route("/", api::info);
     router.add_route("/somethingelse", api::echo_wildcard);
+    router.add_route("/", api::info);
 
     let routed = router.handle(req);
     match routed {
@@ -72,14 +72,6 @@ impl ImTheRouterNow {
     }
 }
 
-fn info(_req: Request) -> Result<Response> {
-    //let planet = params.get("planet").expect("PLANET");
-
-    Ok(http::Response::builder()
-        .status(http::StatusCode::OK)
-        .body(Some(logic::info()))?)
-}
-
 mod logic;
 
 mod api {
@@ -87,7 +79,6 @@ mod api {
 
     // /hello/:planet
     pub fn info(_req: Request) -> Result<Response> {
-        //let planet = params.get("planet").expect("PLANET");
 
         Ok(http::Response::builder()
             .status(http::StatusCode::OK)
